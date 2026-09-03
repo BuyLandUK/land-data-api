@@ -1,0 +1,471 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "BuyLand Land Data API",
+        "version": "1.0.0",
+        "summary": "Free, keyless, read-only UK land data: sold prices, land guide values, registered parcels and planning constraints.",
+        "description": "Public JSON API from BuyLand.co.uk. No API key. Rate limit 120 requests per minute per IP. Every response includes `attribution` and `source_url`; please cite them when you use the data. Documentation: https://buyland.co.uk/developers",
+        "contact": {
+            "name": "BuyLand",
+            "url": "https://buyland.co.uk/contact",
+            "email": "info@buyland.co.uk"
+        },
+        "license": {
+            "name": "Open Government Licence v3.0 (underlying data); see attribution",
+            "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+        }
+    },
+    "servers": [
+        {
+            "url": "https://buyland.co.uk/api/v1"
+        }
+    ],
+    "paths": {
+        "/sold-prices": {
+            "get": {
+                "operationId": "getSoldPrices",
+                "summary": "HM Land Registry sold prices at or near a postcode, uprated to today",
+                "parameters": [
+                    {
+                        "name": "postcode",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "SW1A 1AA"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 25,
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sales",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "postcode": {
+                                            "type": "string"
+                                        },
+                                        "scope": {
+                                            "type": "string",
+                                            "enum": [
+                                                "postcode",
+                                                "nearby",
+                                                "none"
+                                            ]
+                                        },
+                                        "district": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "region": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "count": {
+                                            "type": "integer"
+                                        },
+                                        "sales": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "price_paid": {
+                                                        "type": "integer"
+                                                    },
+                                                    "date": {
+                                                        "type": "string"
+                                                    },
+                                                    "address": {
+                                                        "type": "string"
+                                                    },
+                                                    "estimated_today": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "value": {
+                                                                "type": "integer"
+                                                            },
+                                                            "uplift_pct": {
+                                                                "type": "number"
+                                                            },
+                                                            "index_month": {
+                                                                "type": "string"
+                                                            },
+                                                            "region_index": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "source_url": {
+                                            "type": "string",
+                                            "format": "uri",
+                                            "description": "Human page on buyland.co.uk for this query \u2014 please link to it."
+                                        },
+                                        "attribution": {
+                                            "type": "string",
+                                            "description": "Attribution text to display or cite when using this data."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad postcode"
+                    },
+                    "429": {
+                        "description": "Rate limited"
+                    }
+                }
+            }
+        },
+        "/land-value": {
+            "get": {
+                "operationId": "getLandValue",
+                "summary": "Guide value range for a plot of land",
+                "parameters": [
+                    {
+                        "name": "postcode",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "GL7 5NX"
+                    },
+                    {
+                        "name": "acres",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "minimum": 0.0001,
+                            "maximum": 10000
+                        },
+                        "example": 2.5
+                    },
+                    {
+                        "name": "land_type",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "Agricultural",
+                                "Woodland",
+                                "Pasture",
+                                "Equestrian",
+                                "Residential Plot",
+                                "Commercial",
+                                "Mixed"
+                            ],
+                            "default": "Agricultural"
+                        }
+                    },
+                    {
+                        "name": "planning",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "description": "Has residential planning permission"
+                    },
+                    {
+                        "name": "road_access",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Guide value",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "low": {
+                                            "type": "integer"
+                                        },
+                                        "mid": {
+                                            "type": "integer"
+                                        },
+                                        "high": {
+                                            "type": "integer"
+                                        },
+                                        "price_per_acre": {
+                                            "type": [
+                                                "integer",
+                                                "null"
+                                            ]
+                                        },
+                                        "method": {
+                                            "type": "string",
+                                            "enum": [
+                                                "regional-floor",
+                                                "small-plot-adjacency"
+                                            ]
+                                        },
+                                        "region": {
+                                            "type": "string"
+                                        },
+                                        "factors": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "impact": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "note": {
+                                            "type": "string"
+                                        },
+                                        "source_url": {
+                                            "type": "string",
+                                            "format": "uri",
+                                            "description": "Human page on buyland.co.uk for this query \u2014 please link to it."
+                                        },
+                                        "attribution": {
+                                            "type": "string",
+                                            "description": "Attribution text to display or cite when using this data."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/parcel": {
+            "get": {
+                "operationId": "getParcel",
+                "summary": "The HM Land Registry INSPIRE registered-land parcel containing a point",
+                "parameters": [
+                    {
+                        "name": "lat",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number"
+                        },
+                        "description": "WGS84 latitude (England)"
+                    },
+                    {
+                        "name": "lng",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number"
+                        },
+                        "description": "WGS84 longitude (England)"
+                    },
+                    {
+                        "name": "postcode",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Optional: loads the local authority's parcels if not yet cached"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Parcel or not-found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "found": {
+                                            "type": "boolean"
+                                        },
+                                        "inspire_id": {
+                                            "type": "string"
+                                        },
+                                        "area_sqm": {
+                                            "type": "integer"
+                                        },
+                                        "area_acres": {
+                                            "type": "number"
+                                        },
+                                        "centroid": {
+                                            "type": "object",
+                                            "properties": {
+                                                "lat": {
+                                                    "type": "number"
+                                                },
+                                                "lng": {
+                                                    "type": "number"
+                                                }
+                                            }
+                                        },
+                                        "geometry": {
+                                            "type": "object",
+                                            "description": "GeoJSON geometry (WGS84), simplified to ~1.5 m"
+                                        },
+                                        "note": {
+                                            "type": "string"
+                                        },
+                                        "source_url": {
+                                            "type": "string",
+                                            "format": "uri",
+                                            "description": "Human page on buyland.co.uk for this query \u2014 please link to it."
+                                        },
+                                        "attribution": {
+                                            "type": "string",
+                                            "description": "Attribution text to display or cite when using this data."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/constraints": {
+            "get": {
+                "operationId": "getConstraints",
+                "summary": "National planning designations intersecting a point (13 of the Plot Report's 35 checks)",
+                "parameters": [
+                    {
+                        "name": "lat",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number"
+                        },
+                        "description": "WGS84 latitude (England)"
+                    },
+                    {
+                        "name": "lng",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number"
+                        },
+                        "description": "WGS84 longitude (England)"
+                    },
+                    {
+                        "name": "radius_m",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "minimum": 5,
+                            "maximum": 250,
+                            "default": 25
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Checks",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "checks": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "present": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "entities": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "name": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "reference": {
+                                                                    "type": [
+                                                                        "string",
+                                                                        "null"
+                                                                    ]
+                                                                },
+                                                                "dataset": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "flagged": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "note": {
+                                            "type": "string"
+                                        },
+                                        "source_url": {
+                                            "type": "string",
+                                            "format": "uri",
+                                            "description": "Human page on buyland.co.uk for this query \u2014 please link to it."
+                                        },
+                                        "attribution": {
+                                            "type": "string",
+                                            "description": "Attribution text to display or cite when using this data."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
