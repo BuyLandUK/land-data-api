@@ -24,6 +24,9 @@ print("Parcel:", parcel.get("inspire_id"), parcel.get("area_acres"), "acres")
 cons = get("/constraints", lat=51.2287, lng=-0.4, radius_m=50)
 print("Flagged designations:", ", ".join(cons["flagged"]) or "none")
 
+home = get("/property-value", postcode="CW5 7PX", bedrooms=4)
+print(f"Property value: £{home['low']:,}–£{home['high']:,} ({home['comparables_used']} comparables)")
+
 # Always show the attribution and link to the source_url where you display the data.
 print(sales["attribution"])
 print(sales["source_url"])

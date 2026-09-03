@@ -13,3 +13,6 @@ curl -s "$B/parcel?lat=53.0066&lng=-2.4257" | python3 -m json.tool
 
 echo "# Planning designations at a point (Surrey Hills)"
 curl -s "$B/constraints?lat=51.2287&lng=-0.4&radius_m=50" | python3 -m json.tool
+
+echo "# Indicative value of a 4-bed house at a postcode"
+curl -s "$B/property-value?postcode=CW5%207PX&bedrooms=4" | python3 -m json.tool

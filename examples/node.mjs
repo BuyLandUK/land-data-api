@@ -18,6 +18,9 @@ console.log(`Guide value: £${value.low.toLocaleString()}–£${value.high.toLoc
 const cons = await get("/constraints", { lat: 51.2287, lng: -0.4, radius_m: 50 });
 console.log("Flagged designations:", cons.flagged.join(", ") || "none");
 
+const home = await get("/property-value", { postcode: "CW5 7PX", bedrooms: 4 });
+console.log(`Property value: £${home.low.toLocaleString()}–£${home.high.toLocaleString()} (${home.comparables_used} comparables)`);
+
 // Always show the attribution and link to the source_url where you display the data.
 console.log(sales.attribution);
 console.log(sales.source_url);

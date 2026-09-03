@@ -3,7 +3,7 @@
     "info": {
         "title": "BuyLand Land Data API",
         "version": "1.0.0",
-        "summary": "Free, keyless, read-only UK land data: sold prices, land guide values, registered parcels and planning constraints.",
+        "summary": "Free, keyless, read-only UK land data: sold prices, land and property guide values, registered parcels and planning constraints.",
         "description": "Public JSON API from BuyLand.co.uk. No API key. Rate limit 120 requests per minute per IP. Every response includes `attribution` and `source_url`; please cite them when you use the data. Documentation: https://buyland.co.uk/developers",
         "contact": {
             "name": "BuyLand",
@@ -270,6 +270,97 @@
                 }
             }
         },
+        "/property-value": {
+            "get": {
+                "operationId": "getPropertyValue",
+                "summary": "Indicative value of a dwelling from local HM Land Registry sales uprated to today (use /land-value for bare land)",
+                "parameters": [
+                    {
+                        "name": "postcode",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "CW5 7PX"
+                    },
+                    {
+                        "name": "bedrooms",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 6,
+                            "default": 3
+                        }
+                    },
+                    {
+                        "name": "bathrooms",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 4,
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Value",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "found": {
+                                            "type": "boolean"
+                                        },
+                                        "low": {
+                                            "type": "integer"
+                                        },
+                                        "mid": {
+                                            "type": "integer"
+                                        },
+                                        "high": {
+                                            "type": "integer"
+                                        },
+                                        "comparables_used": {
+                                            "type": "integer"
+                                        },
+                                        "comparables_scope": {
+                                            "type": "string",
+                                            "enum": [
+                                                "postcode",
+                                                "nearby",
+                                                "none"
+                                            ]
+                                        },
+                                        "method": {
+                                            "type": "string"
+                                        },
+                                        "note": {
+                                            "type": "string"
+                                        },
+                                        "source_url": {
+                                            "type": "string",
+                                            "format": "uri",
+                                            "description": "Human page on buyland.co.uk for this query \u2014 please link to it."
+                                        },
+                                        "attribution": {
+                                            "type": "string",
+                                            "description": "Attribution text to display or cite when using this data."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/parcel": {
             "get": {
                 "operationId": "getParcel",
@@ -333,6 +424,25 @@
                                                     "type": "number"
                                                 }
                                             }
+                                        },
+                                        "buildings_count": {
+                                            "type": [
+                                                "integer",
+                                                "null"
+                                            ],
+                                            "description": "Mapped buildings inside the parcel"
+                                        },
+                                        "suggested_valuation": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ],
+                                            "enum": [
+                                                "property-value",
+                                                "land-value",
+                                                null
+                                            ],
+                                            "description": "Which valuation endpoint fits this parcel"
                                         },
                                         "geometry": {
                                             "type": "object",
