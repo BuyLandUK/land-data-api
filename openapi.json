@@ -4,7 +4,7 @@
         "title": "BuyLand Land Data API",
         "version": "1.0.0",
         "summary": "Free, keyless, read-only UK land data: sold prices, land and property guide values, registered parcels and planning constraints.",
-        "description": "Public JSON API from BuyLand.co.uk. No API key. Rate limit 120 requests per minute per IP. Every response includes `attribution` and `source_url`; please cite them when you use the data. Documentation: https://buyland.co.uk/developers",
+        "description": "Public JSON API from BuyLand.co.uk. No API key. Rate limits: 120 requests per minute and 500 requests per day per IP; email info@buyland.co.uk for higher volume. Every response includes `attribution` and `source_url`; please cite them when you use the data. Documentation: https://buyland.co.uk/developers",
         "contact": {
             "name": "BuyLand",
             "url": "https://buyland.co.uk/contact",

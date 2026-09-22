@@ -57,7 +57,7 @@ Coverage: England for parcels and constraints; England and Wales for sold prices
 
 ## Rules
 
-- **Rate limit:** 120 requests per minute per IP. Beyond that you get `429` with a `Retry-After` header.
+- **Rate limits:** 120 requests per minute and 500 requests per day per IP. Beyond either you get `429` with a `Retry-After` header. Need more? Email info@buyland.co.uk and say what you are building.
 - **Attribution:** every response includes `attribution` and `source_url`. Display the attribution and link to the source URL wherever the data appears.
 - **No SLA.** Responses are cached for 5 minutes. This is a free service from a small company; for volume or guarantees, [get in touch](https://buyland.co.uk/contact).
 - **What isn't here:** anything that carries an HM Land Registry fee (title registers, plans, filed deeds) is ordered at cost on the site, never through the API. The full 35-check [Plot Report](https://buyland.co.uk/report) is a product; `/constraints` gives you the free third of it.
